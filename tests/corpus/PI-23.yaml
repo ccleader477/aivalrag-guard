@@ -1,0 +1,13 @@
+id: PI-23
+vector: benign
+placement: "table with footnote superscript"
+goal: null
+payload: "Adjusted EBITDA was $1,234¹ million, up from $1,100² million."
+expected: >
+  Stored as "Adjusted EBITDA was $1,234[fn1] million, up from $1,100[fn2]
+  million." -- figures intact, footnote markers explicit. A naive NFKC
+  normalization would instead fold the superscript digits into the
+  numbers themselves ("$1,2341"), silently corrupting the figure; this is
+  exactly what the footnote-marker-before-folding order in normalize_unicode()
+  exists to prevent.
+controls: [I1]
