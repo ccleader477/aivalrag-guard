@@ -46,6 +46,15 @@ _PATTERNS: dict[str, re.Pattern] = {
     # Graph node ID format -- UUID, matching kg_nodes.id's actual column
     # type (migrations/002_knowledge_graph.sql:49).
     "entity_id": re.compile(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"),
+    # AIValRAG-Backend's own resolved filing identifier -- a UUID (same
+    # shape as entity_id, matching filings.id's column type in
+    # AIValRAG-Backend/migrations/001_create_tables.sql:13), but kept as
+    # a distinct type since it names a different thing: a resolved
+    # filing document, not a knowledge-graph node. This system has no
+    # structured EDGAR ingestion (no real accession numbers anywhere,
+    # per PROMPT_INJECTION_PLAN.md Phase 0 item 11), so document_id is
+    # the actual filing-scoping anchor in practice, not "accession".
+    "document_id": re.compile(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"),
 }
 
 _ENUM_TYPES: dict[str, frozenset] = {

@@ -59,6 +59,15 @@ def test_invalid_fiscal_period_rejected():
         validate_anchor_format("fiscal_period", "Q5 2024")
 
 
+def test_valid_document_id_uuid_passes():
+    validate_anchor_format("document_id", "550e8400-e29b-41d4-a716-446655440000")
+
+
+def test_document_id_not_uuid_rejected():
+    with pytest.raises(AnchorValidationError):
+        validate_anchor_format("document_id", "not-a-real-document-id")
+
+
 def test_valid_metric_from_catalog_passes():
     validate_anchor_format("metric", "adjusted_ebitda")
 

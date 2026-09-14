@@ -10,6 +10,8 @@ import re
 from dataclasses import dataclass, field
 from urllib.parse import urlparse
 
+SANITIZER_VERSION = "1.0.0"
+
 DEFAULT_LINK_ALLOWLIST = frozenset({"sec.gov", "www.sec.gov"})
 DEFAULT_IMAGE_ALLOWLIST: frozenset[str] = frozenset()  # empty by default, per spec
 
