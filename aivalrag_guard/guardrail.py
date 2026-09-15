@@ -91,9 +91,22 @@ class GuardrailClient:
         )
 
     def apply(self, *, source: Source, text: str, qualifiers: list[Qualifier] | None = None) -> GuardrailResult:
-        text_block: dict = {"text": text}
-        if qualifiers:
-            text_block["qualifiers"] = qualifiers
+        """Single content block -- covers most calls (R1's input screen,
+        R4's notes-field screening). For multiple blocks in one call
+        (R6's contextual grounding needs grounding_source + query +
+        guard_content as three distinct qualified blocks together), use
+        apply_content."""
+        return self.apply_content(source=source, parts=[(text, qualifiers)])
+
+    def apply_content(
+        self, *, source: Source, parts: list[tuple[str, list[Qualifier] | None]]
+    ) -> GuardrailResult:
+        content = []
+        for text, qualifiers in parts:
+            text_block: dict = {"text": text}
+            if qualifiers:
+                text_block["qualifiers"] = qualifiers
+            content.append({"text": text_block})
 
         last_error: str | None = None
         for _ in range(self.max_retries + 1):
@@ -102,7 +115,7 @@ class GuardrailClient:
                     guardrailIdentifier=self.guardrail_id,
                     guardrailVersion=self.guardrail_version,
                     source=source,
-                    content=[{"text": text_block}],
+                    content=content,
                 )
                 return GuardrailResult(
                     action=resp.get("action", "NONE"),

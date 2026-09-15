@@ -113,6 +113,48 @@ def test_apply_includes_qualifiers_when_given(stubbed_client):
     assert result.action == "NONE"
 
 
+def test_apply_content_sends_multiple_qualified_blocks_in_one_call(stubbed_client):
+    """R6's actual shape: grounding_source + query + guard_content as
+    three distinct blocks in a single ApplyGuardrail call, not three
+    separate calls."""
+    client, stubber = stubbed_client
+    stubber.add_response(
+        "apply_guardrail", _none_response(),
+        expected_params={
+            "guardrailIdentifier": "gr-test123",
+            "guardrailVersion": "1",
+            "source": "OUTPUT",
+            "content": [
+                {"text": {"text": "TMUS reported revenue of $20B.", "qualifiers": ["grounding_source"]}},
+                {"text": {"text": "What was TMUS revenue?", "qualifiers": ["query"]}},
+                {"text": {"text": "TMUS reported $20B in revenue.", "qualifiers": ["guard_content"]}},
+            ],
+        },
+    )
+    result = client.apply_content(
+        source="OUTPUT",
+        parts=[
+            ("TMUS reported revenue of $20B.", ["grounding_source"]),
+            ("What was TMUS revenue?", ["query"]),
+            ("TMUS reported $20B in revenue.", ["guard_content"]),
+        ],
+    )
+    assert result.action == "NONE"
+
+
+def test_apply_content_single_part_matches_apply(stubbed_client):
+    client, stubber = stubbed_client
+    stubber.add_response(
+        "apply_guardrail", _none_response(),
+        expected_params={
+            "guardrailIdentifier": "gr-test123", "guardrailVersion": "1", "source": "INPUT",
+            "content": [{"text": {"text": "hello"}}],
+        },
+    )
+    result = client.apply_content(source="INPUT", parts=[("hello", None)])
+    assert result.action == "NONE"
+
+
 def test_grounding_scores_extracted_from_assessment(stubbed_client):
     client, stubber = stubbed_client
     stubber.add_response("apply_guardrail", _grounding_response(0.9, 0.85))
