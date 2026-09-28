@@ -17,6 +17,12 @@ EVENT_TYPES = frozenset({
     "er_merge_blocked", "confusable_entity", "lineage_cascade", "community_finding_rejected",
     "graph_query_rejected", "traversal_capped", "claim_unsupported", "xbrl_mismatch",
     "graph_anomaly",
+    # Agent tool loop (aivalrag-chat agent.py). Distinct names rather than
+    # reusing graph_query_rejected/traversal_capped: a query against the
+    # graph and a refused state-changing tool call are different attacks
+    # with different responses, and conflating them would make the
+    # telemetry unusable for detecting either.
+    "agent_tool_gated", "agent_iteration_cap", "agent_tool_result_suspect",
 })
 
 MODES = frozenset({"off", "shadow", "enforce"})
